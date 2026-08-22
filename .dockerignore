@@ -1,0 +1,15 @@
+venv/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+.git/
+.gitignore
+
+.env
+
+faiss_index/
+faiss_index_inspect/
+
+*.log

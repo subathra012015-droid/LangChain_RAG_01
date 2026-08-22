@@ -1,33 +1,36 @@
-# -------------------------------------------------------
-# LangChain RAG Application - Backend Dockerfile
-# -------------------------------------------------------
+# ==========================================================
+# LangChain_RAG_01
+# Dockerfile for a01_app_FAISS
+# ==========================================================
 
-# 1. Use Python 3.11 as the base image
+# 1. Use Python 3.11
 FROM python:3.11-slim
 
-# 2. Prevent Python from creating .pyc files
-ENV PYTHONDONTWRITEBYTECODE=1
 
-# 3. Display Python output immediately
+# 2. Python configuration
+ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# 4. Set working directory inside container
+
+# 3. Working directory inside Docker container
 WORKDIR /app
 
-# 5. Copy requirements first
+
+# 4. Copy requirements first
 COPY requirements.txt .
 
-# 6. Upgrade pip
-RUN pip install --upgrade pip
 
-# 7. Install project dependencies
+# 5. Upgrade pip
+RUN python -m pip install --upgrade pip
+
+
+# 6. Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 8. Copy project files into container
+
+# 7. Copy project files into Docker image
 COPY . .
 
-# 9. FastAPI port
-EXPOSE 8000
 
-# 10. Start FastAPI application
-CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# 8. Start a01 FAISS application
+CMD ["python", "a01_app_FAISS/a01_app_FAISS.py"]
