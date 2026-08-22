@@ -1,0 +1,18 @@
+services:
+
+  langchain-a01:
+
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    image: langchain-rag-a01:latest
+
+    container_name: langchain-a01-container
+
+    env_file:
+      - .env
+
+    stdin_open: true
+    tty: true
+    
