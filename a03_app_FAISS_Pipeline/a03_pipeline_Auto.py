@@ -2,10 +2,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from langchain_openai import (
-    OpenAIEmbeddings,
-    ChatOpenAI
-)
+from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 
 from langchain_community.vectorstores import FAISS
 
@@ -13,11 +10,7 @@ from langchain_core.prompts import ChatPromptTemplate
 
 from langchain_core.output_parsers import StrOutputParser
 
-from langchain_core.runnables import (
-    RunnableLambda,
-    RunnablePassthrough
-)
-
+from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 
 # =========================================================
 # STEP 1: DEFINE PROJECT ROOT
@@ -40,9 +33,7 @@ load_dotenv(BASE_DIR / ".env")
 # Must match the model used while creating the FAISS index.
 # =========================================================
 
-embedding_model = OpenAIEmbeddings(
-    model="text-embedding-3-small"
-)
+embedding_model = OpenAIEmbeddings(model="text-embedding-3-small")
 
 
 # =========================================================
@@ -52,9 +43,7 @@ embedding_model = OpenAIEmbeddings(
 faiss_path = BASE_DIR / "faiss_index"
 
 vector_store = FAISS.load_local(
-    str(faiss_path),
-    embedding_model,
-    allow_dangerous_deserialization=True
+    str(faiss_path), embedding_model, allow_dangerous_deserialization=True
 )
 
 
@@ -62,24 +51,17 @@ vector_store = FAISS.load_local(
 # STEP 5: CONVERT FAISS INTO A RETRIEVER
 # =========================================================
 
-retriever = vector_store.as_retriever(
-    search_type="similarity",
-    search_kwargs={
-        "k": 3
-    }
-)
+retriever = vector_store.as_retriever(search_type="similarity", search_kwargs={"k": 3})
 
 
 # =========================================================
 # STEP 6: FUNCTION TO FORMAT RETRIEVED DOCUMENTS
 # =========================================================
 
+
 def format_documents(documents):
 
-    formatted_text = "\n\n".join(
-        document.page_content
-        for document in documents
-    )
+    formatted_text = "\n\n".join(document.page_content for document in documents)
 
     return formatted_text
 
@@ -100,7 +82,7 @@ Answer the user's question using only the provided context.
 If the answer cannot be found in the context, say exactly:
 
 I don't know based on the provided information.
-"""
+""",
         ),
         (
             "human",
@@ -113,8 +95,8 @@ Context:
 Question:
 
 {question}
-"""
-        )
+""",
+        ),
     ]
 )
 
@@ -123,10 +105,7 @@ Question:
 # STEP 8: CREATE CHAT MODEL
 # =========================================================
 
-chat_model = ChatOpenAI(
-    model="gpt-4.1-mini",
-    temperature=0
-)
+chat_model = ChatOpenAI(model="gpt-4.1-mini", temperature=0)
 
 
 # =========================================================
@@ -140,9 +119,7 @@ output_parser = StrOutputParser()
 # STEP 10: CREATE DOCUMENT FORMATTER RUNNABLE
 # =========================================================
 
-document_formatter = RunnableLambda(
-    format_documents
-)
+document_formatter = RunnableLambda(format_documents)
 
 
 # =========================================================
@@ -150,17 +127,10 @@ document_formatter = RunnableLambda(
 # =========================================================
 
 rag_chain = (
-
-    {
-        "context":
-            retriever
-            | document_formatter,
-
-        "question":
-            RunnablePassthrough()
-    }
-
-    | prompt       | chat_model      | output_parser
+    {"context": retriever | document_formatter, "question": RunnablePassthrough()}
+    | prompt
+    | chat_model
+    | output_parser
 )
 
 
@@ -168,18 +138,14 @@ rag_chain = (
 # STEP 12: ASK USER QUESTION
 # =========================================================
 
-question = input(
-    "\nEnter your question: "
-).strip()
+question = input("\nEnter your question: ").strip()
 
 
 # =========================================================
 # STEP 13: EXECUTE COMPLETE RAG PIPELINE
 # =========================================================
 
-answer = rag_chain.invoke(
-    question
-)
+answer = rag_chain.invoke(question)
 
 
 # =========================================================
